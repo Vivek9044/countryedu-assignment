@@ -1,0 +1,2 @@
+JUSTIFICATION FOR IMPUTATION STRATEGY:
+Median/Mode imputation completed in 0.0031 seconds (highly scalable, $O(N)$ complexity) whereas KNN Imputation took 0.3451 seconds ($O(N^2)$ complexity). While KNN offers slightly lower reconstruction error for some columns, it is computationally infeasible for real-time high-throughput streaming (50,000 events/sec). Therefore, Median/Mode imputation is selected for the production ETL pipeline because it meets both the throughput and latency constraints while keeping downstream prediction performance stable.

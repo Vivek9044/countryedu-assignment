@@ -1,0 +1,14 @@
+--- COST PREDICTION MODEL COMPARISON ---
+Model: Linear Regression
+  RMSE: 88.60
+  MAE: 53.28
+  R2: 0.6137
+  Training Time: 1.03s
+
+Model: XGBoost
+  RMSE: 76.55
+  MAE: 43.73
+  R2: 0.7117
+  Training Time: 2.31s
+
+Selected Model: XGBoost

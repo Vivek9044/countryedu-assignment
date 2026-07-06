@@ -1,0 +1,20 @@
+--- SATISFACTION RISK MODEL COMPARISON ---
+Model: Logistic Regression
+  Precision: 0.9571
+  Recall: 0.6112
+  F1-Score: 0.7460
+  ROC AUC: 0.7919
+  Confusion Matrix:
+    [[7878, 1390], [19727, 31005]]
+  Training Time: 1.50s
+
+Model: XGBoost
+  Precision: 0.9588
+  Recall: 0.6119
+  F1-Score: 0.7470
+  ROC AUC: 0.8011
+  Confusion Matrix:
+    [[7933, 1335], [19690, 31042]]
+  Training Time: 3.20s
+
+Selected Model: XGBoost
