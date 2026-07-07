@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling for Premium Look
+
 st.markdown("""
 <style>
     .main {
@@ -36,7 +36,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Helper function to check if pipeline outputs exist
+
 def check_pipeline_outputs():
     required_files = [
         'data/cleaned_tickets.csv',
@@ -57,7 +57,7 @@ if missing_files:
     st.code("python src/data_generator.py\npython src/etl_pipeline.py\npython src/models/cost_model.py\npython src/models/escalation_model.py\npython src/models/satisfaction_model.py\npython src/models/allocation_optimizer.py\npython src/recommendations.py\npython src/run_eda.py")
     st.stop()
 
-# Load Cleaned Data & Models
+
 @st.cache_data
 def load_data():
     df = pd.read_csv('data/cleaned_tickets.csv')
@@ -66,15 +66,15 @@ def load_data():
 
 df = load_data()
 
-# Load models
+
 cost_model = joblib.load('models_saved/cost_model.joblib')
 esc_model = joblib.load('models_saved/escalation_model.joblib')
 sat_model = joblib.load('models_saved/satisfaction_model.joblib')
 
-# Load LP optimizer allocation table
+
 opt_alloc_df = pd.read_csv('reports/optimized_allocation.csv')
 
-# Parse recommendation file for summary metrics
+
 @st.cache_data
 def parse_recommendation_metrics():
     with open('reports/recommendations.md', 'r') as f:
@@ -90,7 +90,7 @@ def parse_recommendation_metrics():
 
 projected_savings, projected_pct = parse_recommendation_metrics()
 
-# --- SIDEBAR FILTERS ---
+
 st.sidebar.title("🔍 Filter Controls")
 st.sidebar.markdown("Use these to filter the overview insights.")
 
@@ -103,7 +103,7 @@ selected_prio = st.sidebar.selectbox("Priority", priorities)
 categories = ['All'] + sorted(df['issue_category'].unique().tolist())
 selected_cat = st.sidebar.selectbox("Issue Category", categories)
 
-# Apply filters
+
 filtered_df = df.copy()
 if selected_client != 'All':
     filtered_df = filtered_df[filtered_df['client_type'] == selected_client]
@@ -112,16 +112,16 @@ if selected_prio != 'All':
 if selected_cat != 'All':
     filtered_df = filtered_df[filtered_df['issue_category'] == selected_cat]
     
-# Check for empty dataset to prevent errors
+
 if len(filtered_df) == 0:
     st.warning("⚠️ No tickets match the selected filters. Please adjust your criteria in the sidebar.")
     st.stop()
 
-# --- HEADER SECTION ---
+
 st.title("📊 IT Support Cost Optimization & AI Copilot")
 st.markdown("Optimize support routing, reduce escalations, improve customer satisfaction, and predict ticket metrics in real-time.")
 
-# --- KPI METRICS ---
+
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
@@ -154,13 +154,13 @@ with col4:
         delta_color="normal" if projected_pct >= 20.0 else "inverse"
     )
 
-# Progress Bar toward 20% Cost Reduction
+
 st.markdown("### Cost Optimization Progress")
 progress_val = min(1.0, projected_pct / 20.0)
 st.progress(progress_val)
 st.markdown(f"**Target Achievement Status:** {projected_pct:.2f}% / 20.00% target reached.")
 
-# --- MAIN TABS ---
+
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📈 Overview & EDA", 
     "🤖 Live Prediction Playground", 
@@ -169,7 +169,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🧠 Model Insights"
 ])
 
-# TAB 1: OVERVIEW & EDA
+
 with tab1:
     st.subheader("Interactive Insights Explorer")
     st.write("These charts dynamically update in real-time based on the sidebar filters.")
@@ -246,12 +246,12 @@ with tab1:
         st.plotly_chart(fig_eng, use_container_width=True)
         st.caption("Takeaway: Mid and Senior engineers resolve tickets much faster than Junior engineers.")
 
-# TAB 2: LIVE PREDICTION PLAYGROUND
+
 with tab2:
     st.subheader("Predictive Analytics Playground")
     st.write("Input a new ticket's properties below to run predictions. Our models will estimate cost, escalation risk, and satisfaction risk instantly.")
     
-    # Form layout
+   
     with st.form("prediction_form"):
         pred_col1, pred_col2 = st.columns(2)
         
@@ -280,20 +280,20 @@ with tab2:
             'hour_of_day': hour_input
         }
         
-        # Test latency & predictions
+       
         t_start = time.time()
         
-        # DataFrame format for models
+       
         input_df = pd.DataFrame([ticket_dict])
         
-        # Cost prediction
+     
         cost_pred = cost_model.predict(input_df)[0]
         
-        # Escalation prediction
+        
         esc_prob = esc_model.predict_proba(input_df)[0, 1]
         esc_pred = esc_model.predict(input_df)[0]
         
-        # Satisfaction risk prediction
+     
         sat_prob = sat_model.predict_proba(input_df)[0, 1]
         sat_pred = sat_model.predict(input_df)[0]
         
@@ -301,7 +301,7 @@ with tab2:
         
         st.success(f"🤖 Prediction complete in {latency:.4f} seconds! (Wall-clock constraint: < 5.0 seconds)")
         
-        # Results display
+      
         res_col1, res_col2, res_col3 = st.columns(3)
         
         with res_col1:
@@ -329,17 +329,16 @@ with tab2:
             else:
                 st.success("✅ Satisfaction score expected to remain above 4.2.")
 
-# TAB 3: RECOMMENDATIONS
+
 with tab3:
     st.subheader("Data-Driven Cost Optimization Strategy")
     st.write("These recommendations are computed directly by running statistical comparisons and machine learning models on the raw ticket data.")
-    
-    # Read the reports/recommendations.md and display it
+   
     with open('reports/recommendations.md', 'r') as f:
         recs_md = f.read()
     st.markdown(recs_md)
 
-# TAB 4: ENGINEER ALLOCATION OPTIMIZER
+
 with tab4:
     st.subheader("Optimal Engineer Allocation Table")
     st.write(
@@ -348,7 +347,7 @@ with tab4:
         "each week to minimize cost while meeting SLA targets."
     )
     
-    # Show data table
+
     st.dataframe(opt_alloc_df.style.format({
         'weekly_volume': '{:.1f}',
         'allocated_junior': '{:.1f}',
@@ -364,7 +363,6 @@ with tab4:
         "- **SLA Targets (Max Resolution Time)**: Critical: 1.5 hrs | High: 3.0 hrs | Medium: 6.0 hrs | Low: 12.0 hrs."
     )
 
-# TAB 5: MODEL INSIGHTS
 with tab5:
     st.subheader("Model Architectures and Comparison Reports")
     
